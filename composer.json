@@ -1,0 +1,8 @@
+{
+    "require": {
+        "google/apiclient": "^2.18",
+        "guzzlehttp/guzzle": "^7.0",
+        "guzzlehttp/psr7": "^2.0",
+        "psr/http-message": "^1.0"
+    }
+}
