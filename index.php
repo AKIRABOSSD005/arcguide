@@ -243,15 +243,20 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
                 String(visitorTime.getMinutes()).padStart(2, '0') + ':' +
                 String(visitorTime.getSeconds()).padStart(2, '0');
 
+            // Get visitor's timezone
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
             // Send to server via POST
             fetch('functions/trackVisitor.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'visitorDateTime=' + encodeURIComponent(visitorDateTime)
+                body: 'visitorDateTime=' + encodeURIComponent(visitorDateTime) +
+                    '&timezone=' + encodeURIComponent(tz)
             })
                 .catch(err => console.error('Visitor tracking error:', err));
         });
     </script>
+
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {

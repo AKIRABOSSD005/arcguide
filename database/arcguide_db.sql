@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 31, 2025 at 11:36 AM
+-- Generation Time: Aug 31, 2025 at 04:27 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -40,6 +40,37 @@ CREATE TABLE `accommodations` (
   `price_range` varchar(50) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `audit_trail`
+--
+
+CREATE TABLE `audit_trail` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `action` enum('INSERT','UPDATE','DELETE','LOGIN','LOGOUT') NOT NULL,
+  `table_name` varchar(100) NOT NULL,
+  `record_id` int(11) DEFAULT NULL,
+  `old_data` text DEFAULT NULL,
+  `new_data` text DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `audit_trail`
+--
+
+INSERT INTO `audit_trail` (`id`, `user_id`, `action`, `table_name`, `record_id`, `old_data`, `new_data`, `ip_address`, `created_at`) VALUES
+(19, 1, 'LOGIN', 'users', 1, NULL, '{\"email\":\"domingo.earlgerald005@gmail.com\",\"name\":\"Earl Gerald Domingo\",\"role\":\"admin\",\"tz\":\"Asia\\/Manila\"}', '::1', '2025-08-31 21:56:49'),
+(20, 1, 'LOGOUT', 'users', 1, '{\"email\":\"domingo.earlgerald005@gmail.com\",\"name\":\"Earl Gerald Domingo\",\"role\":\"admin\"}', NULL, '::1', '2025-08-31 22:07:40'),
+(21, 1, 'LOGIN', 'users', 1, NULL, '{\"email\":\"domingo.earlgerald005@gmail.com\",\"name\":\"Earl Gerald Domingo\",\"role\":\"admin\",\"tz\":\"Asia\\/Manila\"}', '::1', '2025-08-31 22:07:45'),
+(22, 1, 'LOGOUT', 'users', 1, '{\"email\":\"domingo.earlgerald005@gmail.com\",\"name\":\"Earl Gerald Domingo\",\"role\":\"admin\"}', NULL, '::1', '2025-08-31 22:12:20'),
+(23, 15, 'LOGIN', 'users', 15, NULL, '{\"email\":\"earlgerald.domingo005@gmail.com\",\"name\":\"Earl Gerald Domingo\",\"role\":\"user\",\"tz\":\"Asia\\/Manila\"}', '::1', '2025-08-31 22:18:30'),
+(24, 15, 'LOGOUT', 'users', 15, '{\"email\":\"earlgerald.domingo005@gmail.com\",\"name\":\"Earl Gerald Domingo\",\"role\":\"user\"}', NULL, '::1', '2025-08-31 22:18:56'),
+(25, 15, 'LOGIN', 'users', 15, NULL, '{\"email\":\"earlgerald.domingo005@gmail.com\",\"name\":\"Earl Gerald Domingo\",\"role\":\"admin\",\"tz\":\"Asia\\/Manila\"}', '::1', '2025-08-31 22:19:01');
 
 -- --------------------------------------------------------
 
@@ -84,7 +115,14 @@ CREATE TABLE `events` (
 --
 
 INSERT INTO `events` (`id`, `title`, `description`, `start_date`, `end_date`, `location`, `image`, `category_id`, `is_approved`, `created_by`, `created_at`) VALUES
-(1, 'Test Event Agust', 'sample', '2025-08-14', '2025-08-17', 'Poblacion, San Miguel, Bulacan', 'assets/events/689c76c66c687_Screenshot (4).png', 4, 'admin', 1, '2025-08-13 19:28:06');
+(1, 'Test Event Agust', 'sample', '2025-08-14', '2025-08-17', 'Poblacion, San Miguel, Bulacan', 'assets/events/689c76c66c687_Screenshot (4).png', 4, 'admin', 1, '2025-08-13 19:28:06'),
+(2, 'Apol 51st Birthday', 'Sample ni apol', '2025-09-09', '2025-09-09', 'Camias, San Miguel, Bulacan', 'assets/events/68b419dc27a78_draft tarp.jpg', 1, 'admin', 2, '2025-08-31 17:46:04'),
+(3, 'SAmple', 'sample 123456', '2025-09-01', '2025-09-03', 'Tigpalas, San Miguel Bulacan', 'assets/events/68b41d4ec9813_426e2ad6-d4cd-4378-ab5c-26f616edd3f1.jfif', 3, NULL, 2, '2025-08-31 18:00:46'),
+(4, 'adadadaa', 'aasasdasdasdasdasdasd', '2025-09-15', '2025-09-16', 'aaasdsadad', 'assets/events/68b420c4d867e_875e4d3b-ab81-4fdd-833d-e04d55f28658.jfif', 3, NULL, 2, '2025-08-31 10:15:32'),
+(5, '123', '1232131313', '2025-09-01', '2025-09-02', '12', 'assets/events/68b423d154a69_national ID FRON.jfif', 1, NULL, 4, '2025-08-31 18:27:49'),
+(6, 'Test Event', 'asdasdasd', '2025-09-03', '2025-09-04', 'asdasdasd', 'assets/events/68b43901a8fb0_national ID BACK.jfif', 2, NULL, 14, '2025-08-31 19:58:15'),
+(7, 'asddddhdhshshaasasas', 'asdasdadasdsa', '2025-09-05', '2025-09-06', 'asdasdasdasdasdasdasdasd', 'assets/events/68b43dc30d839_Screenshot 2025-08-31 161603.png', 2, NULL, 14, '2025-08-31 20:18:42'),
+(8, 'aaaaaaaa', 'aaaaaa', '2025-09-05', '2025-09-06', 'aaaaaa', 'assets/events/68b43defef840_Screenshot 2025-08-16 164024.png', 4, NULL, 14, '2025-08-31 20:19:38');
 
 -- --------------------------------------------------------
 
@@ -323,24 +361,19 @@ CREATE TABLE `users` (
   `email` varchar(150) NOT NULL,
   `password` varchar(255) NOT NULL,
   `role` enum('admin','user') DEFAULT 'user',
+  `timezone` varchar(100) DEFAULT NULL,
   `loggedTime` datetime DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `password`, `role`, `loggedTime`, `created_at`, `updated_at`) VALUES
-(1, 'Admin', 'domingo.earlgerald005@gmail.com', 'Password', 'admin', '2025-08-31 09:33:28', '2025-07-19 12:48:43', '2025-08-31 15:33:28'),
-(2, 'User', 'earlgerald.domingo005@gmail.com', 'userpassword', 'user', '2025-08-13 14:28:40', '2025-07-19 12:48:43', '2025-08-13 20:28:40'),
-(3, 'Domingo, Earl Gerald', 'earlgeralddomingo.basc@gmail.com', '', 'user', NULL, '2025-07-28 18:00:09', '2025-07-28 18:00:09'),
-(4, 'Area Coop', 'areacoop005@gmail.com', '', 'user', '2025-08-04 15:30:49', '2025-07-28 18:06:54', '2025-08-04 21:30:49'),
-(5, 'Nicole Alyssa Lopez', 'nicolealyssa30lopez@gmail.com', '', 'user', NULL, '2025-07-28 18:25:45', '2025-07-28 18:25:45'),
-(6, 'Lopez, Nicole Alyssa', 'nicolealyssalopez.basc@gmail.com', '', 'user', '2025-08-04 13:21:03', '2025-07-28 18:26:57', '2025-08-04 19:21:03'),
-(7, 'Lopez, Nicole Alyssa', 'lopez.nicolealyssa.business@gmail.com', '', 'user', NULL, '2025-07-28 18:33:45', '2025-07-28 18:33:45'),
-(8, 'Lopez, Nicole Alyssa', 'nicolealyssafranciscolopez@gmail.com', '', 'user', NULL, '2025-08-04 11:04:51', '2025-08-04 11:04:51');
+INSERT INTO `users` (`id`, `name`, `email`, `password`, `role`, `timezone`, `loggedTime`, `created_at`, `updated_at`) VALUES
+(1, 'Admin', 'domingo.earlgerald005@gmail.com', 'Password', 'admin', 'Asia/Manila', '2025-08-31 22:07:45', '2025-07-19 12:48:43', '2025-08-31 17:41:09'),
+(15, 'Earl Gerald Domingo', 'earlgerald.domingo005@gmail.com', '', 'admin', 'Asia/Manila', '2025-08-31 22:19:01', '2025-08-31 22:18:30', '2025-08-31 22:18:30');
 
 -- --------------------------------------------------------
 
@@ -352,16 +385,17 @@ CREATE TABLE `visitors` (
   `id` int(10) UNSIGNED NOT NULL,
   `ip_address` varchar(45) NOT NULL,
   `user_agent` text NOT NULL,
+  `timezone` varchar(100) DEFAULT NULL,
   `visit_date` date NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `visitors`
 --
 
-INSERT INTO `visitors` (`id`, `ip_address`, `user_agent`, `visit_date`, `created_at`) VALUES
-(1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 Edg/139.0.0.0', '2025-08-31', '2025-08-31 09:29:18');
+INSERT INTO `visitors` (`id`, `ip_address`, `user_agent`, `timezone`, `visit_date`, `created_at`) VALUES
+(39, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 Edg/139.0.0.0', 'UTC', '2025-08-31', '2025-08-31 08:19:01');
 
 --
 -- Indexes for dumped tables
@@ -372,6 +406,13 @@ INSERT INTO `visitors` (`id`, `ip_address`, `user_agent`, `visit_date`, `created
 --
 ALTER TABLE `accommodations`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `audit_trail`
+--
+ALTER TABLE `audit_trail`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `businesses`
@@ -466,6 +507,12 @@ ALTER TABLE `accommodations`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `audit_trail`
+--
+ALTER TABLE `audit_trail`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+
+--
 -- AUTO_INCREMENT for table `businesses`
 --
 ALTER TABLE `businesses`
@@ -475,7 +522,7 @@ ALTER TABLE `businesses`
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `event_categories`
@@ -529,17 +576,23 @@ ALTER TABLE `tourist_spots`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `visitors`
 --
 ALTER TABLE `visitors`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `audit_trail`
+--
+ALTER TABLE `audit_trail`
+  ADD CONSTRAINT `audit_trail_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `events`

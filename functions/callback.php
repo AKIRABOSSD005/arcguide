@@ -5,6 +5,16 @@ session_start();
 use Google\Client;
 use Google\Service\Oauth2 as GoogleServiceOauth2;
 
+
+// =====================
+// DEBUG MODE ON
+// =====================
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+
+
 // =====================
 // STEP 1: Google OAuth Setup
 // =====================
@@ -12,14 +22,17 @@ $client = new Google_Client();
 $client->setClientId('278002340718-260nltculojfelvkfb8na37fp6e86b6c.apps.googleusercontent.com');
 $client->setClientSecret('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');
 
-$host = $_SERVER['HTTP_HOST']; 
-if (strpos($host, 'localhost') === 0 || strpos($host, '127.0.0.1') === 0 || strpos($host, '[::1]') === 0) {
-    $redirectUri = 'http://localhost:3000/functions/callback.php';
-    $isLocal = true;
-} else {
-    $redirectUri = 'https://arcguide.bascpcc.com/functions/callback.php';
-    $isLocal = false;
-}
+ $host = $_SERVER['HTTP_HOST']; 
+ if (strpos($host, 'localhost') === 0 || strpos($host, '127.0.0.1') === 0 || strpos($host, '[::1]') === 0) {
+     $redirectUri = 'http://localhost:3000/functions/callback.php';
+     $isLocal = true;
+ } else {
+     $redirectUri = 'https://arcguide.bascpcc.com/functions/callback.php';
+     $isLocal = false;
+ }
+
+
+
 $client->setRedirectUri($redirectUri);
 
 $client->addScope('email');
