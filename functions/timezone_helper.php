@@ -2,7 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
+//included in the callback.php file
 function getUserDateTime(): string {
     $tz = $_SESSION['user_timezone'] ?? 'UTC';
     

@@ -42,7 +42,7 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a href="spots" class="sidebar-link" title="Manage Tourist Spots">
+                    <a href="manage_spots.php" class="sidebar-link" title="Manage Tourist Spots">
                         <i class="lni lni-map"></i>
                         <span>Manage Tourist Spots</span>
                     </a>

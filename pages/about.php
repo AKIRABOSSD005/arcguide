@@ -55,7 +55,7 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
                             </li>
                         <?php else: ?>
                             <li class="nav-item">
-                                <a class="nav-link" href="pages/loginPage.php">
+                                <a class="nav-link" href="loginPage.php">
                                     <span class="profile-icon"></span>
                                 </a>
                             </li>
