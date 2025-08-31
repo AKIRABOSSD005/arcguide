@@ -16,4 +16,10 @@ while ($row = $result->fetch_assoc()) {
   ];
 }
 
+$mapPinsCount = 0;
+foreach ($spots as $spot) {
+    if (!empty($spot['position']['lat']) && !empty($spot['position']['lng'])) {
+        $mapPinsCount++;
+    }
+}
 

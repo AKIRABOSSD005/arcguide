@@ -5,6 +5,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
 $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
 
+require_once 'functions/trackVisitor.php';
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

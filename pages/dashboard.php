@@ -19,293 +19,6 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
     <link rel="stylesheet" href="../assets/css/dashboard.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.lineicons.com/4.0/lineicons.css">
-    <style>
-        body {
-            background: #f5f5f5;
-        }
-
-        .about-backtotop {
-            position: fixed;
-            bottom: 32px;
-            right: 32px;
-            z-index: 999;
-            background: #114f89;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            box-shadow: 0 2px 8px rgba(18, 60, 99, 0.15);
-            cursor: pointer;
-            opacity: 0.85;
-            transition: background 0.2s, opacity 0.2s;
-        }
-
-        .about-backtotop:hover {
-            background: #46b07d;
-            opacity: 1;
-        }
-
-
-        .wrapper {
-            min-height: 100vh;
-            display: flex;
-        }
-
-        /* ==== SIDEBAR ==== */
-        .sidebar {
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 260px;
-            background: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0;
-            z-index: 100;
-            transition: width 0.3s;
-        }
-
-        .sidebar.collapsed {
-            width: 60px;
-            align-items: flex-start;
-        }
-
-        /* Sidebar Logo */
-        .sidebar-logo {
-            width: 100%;
-            text-align: center;
-            padding: 24px 0 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: padding 0.3s;
-            cursor: pointer;
-        }
-
-        .sidebar.collapsed .sidebar-logo {
-            padding: 16px 0 0;
-            text-align: left;
-            width: 60px;
-        }
-
-        .logo-full {
-            width: 120px;
-            margin-bottom: 8px;
-            display: block;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-
-        .logo-mini {
-            width: 40px;
-            margin-bottom: 8px;
-            display: none;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-
-        .sidebar.collapsed .logo-full {
-            display: none;
-        }
-
-        .sidebar.collapsed .logo-mini {
-            display: block;
-            margin-left: 10px;
-        }
-
-        /* Sidebar Toggler */
-        .sidebar-toggler-box {
-            position: absolute;
-            top: 60px;
-            left: 100%;
-            transform: translateX(-50%);
-            background: #114f89;
-            border-radius: 6px;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-            cursor: pointer;
-            z-index: 101;
-            transition: left 0.3s, background 0.2s;
-        }
-
-        .sidebar-toggler-box:hover {
-            background: #46b07d;
-        }
-
-        .sidebar-toggler-box .bi-list {
-            color: #fff;
-            font-size: 1.5rem;
-        }
-
-        .sidebar.collapsed .sidebar-toggler-box {
-            left: 60px;
-            top: 16px;
-            transform: none;
-        }
-
-        /* Sidebar Nav */
-        .sidebar-nav {
-            margin-top: 32px;
-            width: 100%;
-            padding-left: 0;
-            transition: margin-top 0.3s;
-        }
-
-        .sidebar.collapsed .sidebar-nav {
-            margin-top: 80px;
-            width: 60px;
-        }
-
-        .sidebar-item {
-            width: 100%;
-        }
-
-        .sidebar-link {
-            display: flex;
-            align-items: center;
-            padding: 12px 32px;
-            color: #114f89;
-            font-weight: 500;
-            text-decoration: none;
-            transition: background 0.2s, padding 0.3s, color 0.2s;
-            white-space: nowrap;
-        }
-
-        .sidebar-link.active,
-        .sidebar-link:hover {
-            background: #e3e3e3;
-            color: #46b07d !important;
-        }
-
-        .sidebar-link i {
-            margin-right: 12px;
-            font-size: 1.2rem;
-            min-width: 24px;
-            text-align: center;
-            color: inherit;
-        }
-
-        .sidebar.collapsed .sidebar-link {
-            justify-content: center;
-            padding: 12px 0;
-            width: 60px;
-        }
-
-        .sidebar.collapsed .sidebar-link i {
-            margin-right: 0;
-        }
-
-        .sidebar.collapsed .sidebar-link span {
-            display: none;
-        }
-
-        /* ==== FOOTER ==== */
-        .footer {
-            width: 100%;
-            background: #fff;
-            border-top: 1px solid #eee;
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            z-index: 99;
-            padding: 12px 16px;
-            text-align: center;
-        }
-
-        /* Tablet and smaller - footer becomes static to avoid overlap */
-        @media (max-width: 991.98px) {
-            .footer {
-                position: relative;
-                bottom: auto;
-                left: auto;
-            }
-        }
-
-        /* Mobile - smaller padding for compact space */
-        @media (max-width: 575.98px) {
-            .footer {
-                padding: 8px 12px;
-                font-size: 0.9rem;
-            }
-
-            .dashboard-header {
-                flex-direction: column !important;
-                text-align: center !important;
-                align-items: center !important;
-                margin: 0 !important;
-                padding: 16px !important;
-                width: 100% !important;
-                gap: 8px !important;
-
-            }
-
-            .dashboard-header h5 {
-                width: 100%;
-                margin-bottom: 8px;
-            }
-
-            .dashboard-header>div {
-                justify-content: center !important;
-            }
-
-            .about-backtotop {
-                bottom: 16px;
-                right: 16px;
-                width: 40px;
-                height: 40px;
-                font-size: 1.2rem;
-            }
-        }
-
-
-        .waving-hand {
-            display: inline-block;
-            animation: wave 1s ease-in-out 0s 3;
-            transform-origin: 70% 70%;
-        }
-
-        @keyframes wave {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            15% {
-                transform: rotate(20deg);
-            }
-
-            30% {
-                transform: rotate(-10deg);
-            }
-
-            45% {
-                transform: rotate(20deg);
-            }
-
-            60% {
-                transform: rotate(-5deg);
-            }
-
-            75% {
-                transform: rotate(10deg);
-            }
-
-            100% {
-                transform: rotate(0deg);
-            }
-        }
-    </style>
 
     <div class="wrapper">
         <aside class="sidebar" id="sidebar">
@@ -372,7 +85,7 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
                         <span class="fw-semibold mt-2">
                             <?php echo htmlspecialchars($_SESSION['user']['name'] ?? 'Guest'); ?>
                         </span>
-
+                        
                         <img src="<?= htmlspecialchars($_SESSION['user']['picture']) ?>" alt="Profile"
                             class="rounded-circle" width="36" height="36" style="object-fit: cover;">
                     </div>
@@ -394,11 +107,11 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
 
 
                     $eventsCount = isset($events) ? count($events) : 0;
-                    $mapPinsCount = isset($pinLocations) ? count($pinLocations) : 0;
+                    $mapPinsCount = isset($spots) ? count($spots) : 0;
                     $touristSpotsCount = isset($spots) ? count($spots) : 0;
-                    
+
                     $dashboardCards = [
-                        
+
                         [
                             'icon' => '../assets/icons/events.svg',
                             'count' => $eventsCount,
@@ -426,8 +139,9 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
                             <div class="card shadow-sm border-0 text-center py-3">
                                 <img src="<?php echo $card['icon']; ?>"
                                     alt="<?php echo htmlspecialchars($card['label']); ?>"
-                                    style="width:40px;height:40px;margin-bottom:8px;">
+                                    style="width:60px;height:60px;object-fit:contain;margin-bottom:1px;margin-left:auto;margin-right:auto;">
                                 <div class="fs-3 fw-bold"><?php echo $card['count']; ?></div>
+
                                 <div class="text-muted"><?php echo htmlspecialchars($card['label']); ?></div>
                             </div>
                         </div>
@@ -438,19 +152,20 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
                         <div class="card shadow-sm border-0 h-100">
                             <div class="card-body">
                                 <h6 class="card-title mb-2">Visitors per Year</h6>
-                                <!-- Chart or content here -->
+                                <canvas id="visitorsChart"></canvas>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="card shadow-sm border-0 h-100">
                             <div class="card-body">
-                                <h6 class="card-title mb-2">Tourists Spot by Category</h6>
-                                <!-- Chart or content here -->
+                                <h6 class="card-title mb-2">Tourist Spots by Category</h6>
+                                <canvas id="spotsChart"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <div class="row g-3 mb-4">
                     <div class="col-12">
                         <div class="card shadow-sm border-0">
@@ -463,6 +178,27 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
                 </div>
             </div>
         </main>
+
+
+
+        <!-- Logout Confirmation Modal -->
+        <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-dark" id="logoutModalLabel">Logout Confirmation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-dark">
+                        Are you sure you want to log out?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                        <a href="functions/logout.php" class="btn btn-danger">Yes, Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
         <button class="about-backtotop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to Top"
@@ -485,6 +221,8 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
     </footer>
     <script src="../assets/bootstrap-5.3.3-dist/js/bootstrap.bundle.js"></script>
     <script src="../assets/js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
         document.getElementById('sidebarToggler').addEventListener('click', function () {
             var sidebar = document.getElementById('sidebar');
@@ -496,6 +234,7 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
                 content.style.marginLeft = '260px';
             }
         });
+
     </script>
     </body>
 
