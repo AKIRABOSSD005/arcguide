@@ -141,12 +141,14 @@ $googleLoginUrl = include('../functions/loginGoogle.php');
         </form>
         <div class="divider">or</div>
         <a href="<?php echo $googleLoginUrl; ?>" class="btn btn-google w-100 mb-3">
-
             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google Logo">
             Continue with Google
         </a>
+
     </div>
     <script src="../assets/bootstrap-5.3.3-dist/js/bootstrap.bundle.js"></script>
+    <script src="../assets/js/timezone.js"></script>
+
 </body>
 
 </html>

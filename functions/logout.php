@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../config/dbcon.php'; // ✅ connect to DB for audit trail
+require '../config/dbcon.php';
 
 if (isset($_SESSION['user'])) {
     $userId = $_SESSION['user']['id'];
@@ -8,7 +8,11 @@ if (isset($_SESSION['user'])) {
     $name   = $_SESSION['user']['name'];
     $role   = $_SESSION['user']['role'];
     $ip     = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-    $now    = date('Y-m-d H:i:s');
+
+    // Use user's timezone if available
+    $tz = $_SESSION['user']['timezone'] ?? 'UTC';
+    $dt = new DateTime("now", new DateTimeZone($tz));
+    $now = $dt->format('Y-m-d H:i:s');
 
     // Insert into Audit Trail
     $stmt = $conn->prepare("INSERT INTO audit_trail (user_id, action, table_name, record_id, old_data, ip_address, created_at) 
@@ -24,9 +28,10 @@ if (isset($_SESSION['user'])) {
     $conn->close();
 }
 
-// ✅ Clear session after logging
+// Clear session
 $_SESSION = [];
 session_destroy();
 
 header("Location: ../index.php");
 exit();
+

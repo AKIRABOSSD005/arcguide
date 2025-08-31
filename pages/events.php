@@ -4,6 +4,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
+$flashMessage = $_SESSION['flash_message'] ?? null;
+unset($_SESSION['flash_message']); // Only show once
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -265,7 +267,7 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
                             <a href="maps.php" class="btn btn-light fw-semibold px-4">View on Map</a>
                         </div>
                         <div class="col-12 col-md-4 text-center mt-3 mt-md-0">
-                            <img src="../assets/events/san-miguel-fiesta.svg" alt="San Miguel Town Fiesta"
+                            <img src="../assets/icons/R.jpg" alt="San Miguel Town Fiesta"
                                 class="img-fluid rounded-3 shadow" style="max-height:180px;">
                         </div>
                     </div>
@@ -275,6 +277,9 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
                 <section class="submit-section mb-5">
                     <h2 class="fw-bold mb-3" style="color:#114f89;">📤 Submit Your Event</h2>
                     <form method="POST" action="../functions/events_submit.php" enctype="multipart/form-data">
+                        <input type="hidden" name="visitorDateTime"
+                            id="visitorDateTime"><!-- 👈 hidden local datetime -->
+
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label for="title" class="form-label text-dark">Event Name</label>
@@ -361,6 +366,22 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
                         aria-label="Close"></button>
                 </div>
             </div>
+        </div>
+
+
+        <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+            <?php if ($flashMessage): ?>
+                <div id="flashToast" class="toast border-0 shadow-sm rounded-4 bg-success text-white" role="alert"
+                    aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+                    <div class="d-flex align-items-center p-3">
+                        <div class="toast-body fs-6">
+                            <?= htmlspecialchars($flashMessage) ?>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white ms-auto me-1" data-bs-dismiss="toast"
+                            aria-label="Close"></button>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
 
 
@@ -506,7 +527,35 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
     </script>
 
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const visitorInput = document.getElementById('visitorDateTime');
 
+            if (visitorInput) {
+                const now = new Date();
+
+                // Format as YYYY-MM-DD HH:MM:SS
+                const visitorDateTime = now.getFullYear() + '-' +
+                    String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(now.getDate()).padStart(2, '0') + ' ' +
+                    String(now.getHours()).padStart(2, '0') + ':' +
+                    String(now.getMinutes()).padStart(2, '0') + ':' +
+                    String(now.getSeconds()).padStart(2, '0');
+
+                visitorInput.value = visitorDateTime;
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const flashToastEl = document.getElementById('flashToast');
+            if (flashToastEl) {
+                const toast = new bootstrap.Toast(flashToastEl);
+                toast.show();
+            }
+        });
+    </script>
 
 
 

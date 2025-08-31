@@ -5,18 +5,15 @@ session_start();
 use Google\Client;
 use Google\Service\Oauth2 as GoogleServiceOauth2;
 
+// =====================
 // STEP 1: Google OAuth Setup
+// =====================
 $client = new Google_Client();
 $client->setClientId('278002340718-260nltculojfelvkfb8na37fp6e86b6c.apps.googleusercontent.com');
 $client->setClientSecret('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');
 
-// Determine redirect URI
-$host = $_SERVER['HTTP_HOST']; // includes port if present
-if (
-    strpos($host, 'localhost') === 0 ||
-    strpos($host, '127.0.0.1') === 0 ||
-    strpos($host, '[::1]') === 0
-) {
+$host = $_SERVER['HTTP_HOST']; 
+if (strpos($host, 'localhost') === 0 || strpos($host, '127.0.0.1') === 0 || strpos($host, '[::1]') === 0) {
     $redirectUri = 'http://localhost:3000/functions/callback.php';
     $isLocal = true;
 } else {
@@ -28,15 +25,18 @@ $client->setRedirectUri($redirectUri);
 $client->addScope('email');
 $client->addScope('profile');
 
+// =====================
 // STEP 2: Get Authorization Code
+// =====================
 if (!isset($_GET['code'])) {
     echo "No authorization code received.";
     exit;
 }
 
+// =====================
 // STEP 3: Fetch Access Token
+// =====================
 $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
-
 if ($token === null || isset($token['error'])) {
     echo "<h3>OAuth Token Fetch Error</h3><pre>";
     var_dump($token);
@@ -45,84 +45,86 @@ if ($token === null || isset($token['error'])) {
 }
 $client->setAccessToken($token);
 
+// =====================
 // STEP 4: Get User Info
+// =====================
 $oauth = new GoogleServiceOauth2($client);
 $userInfo = $oauth->userinfo->get();
 
 $email = $userInfo->email;
-$name = $userInfo->name;
+$name  = $userInfo->name;
 
-// STEP 5: Connect to DB
+// =====================
+// STEP 5: Connect to DB + Timezone helper
+// =====================
 require '../config/dbcon.php';
+require_once '../functions/timezone_helper.php';
 
-// STEP 6: Check if user already exists
+// Get actual timezone from session
+$now = getUserDateTime(); 
+$tz  = $_SESSION['user_timezone'] ?? 'UTC'; // actual browser timezone
+
+// =====================
+// STEP 6: User check & insert/update
+// =====================
 $emailEscaped = $conn->real_escape_string($email);
 $query = "SELECT * FROM users WHERE email = '$emailEscaped'";
 $result = $conn->query($query);
 
-$now = date('Y-m-d H:i:s');
-
 if ($result->num_rows === 0) {
-    // Insert new user
-    $stmt = $conn->prepare("INSERT INTO users (name, email, password, role, created_at, updated_at, loggedTime) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $password = ''; // No password for Google login
+    $stmt = $conn->prepare("INSERT INTO users (name, email, password, role, created_at, updated_at, loggedTime, timezone) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $password = ''; 
     $role = 'user';
-    $stmt->bind_param("sssssss", $name, $email, $password, $role, $now, $now, $now);
+    $stmt->bind_param("ssssssss", $name, $email, $password, $role, $now, $now, $now, $tz);
     $stmt->execute();
-    $userId = $stmt->insert_id; // Get auto-incremented ID of new user
+    $userId = $stmt->insert_id;
     $stmt->close();
 } else {
-    // Existing user — get their ID and role
     $row = $result->fetch_assoc();
     $userId = $row['id'];
-    $role = $row['role'];
+    $role   = $row['role'];
 
-    // Update login time
-    $updateStmt = $conn->prepare("UPDATE users SET loggedTime = ? WHERE email = ?");
-    $updateStmt->bind_param("ss", $now, $email);
+    $updateStmt = $conn->prepare("UPDATE users SET loggedTime = ?, timezone = ? WHERE email = ?");
+    $updateStmt->bind_param("sss", $now, $tz, $email);
     $updateStmt->execute();
     $updateStmt->close();
 }
 
-// ✅ STEP 6.1: Insert into Audit Trail (LOGIN)
+// =====================
+// STEP 7: Audit Trail
+// =====================
 $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-$auditStmt = $conn->prepare("INSERT INTO audit_trail (user_id, action, table_name, record_id, new_data, ip_address, created_at) 
-                             VALUES (?, 'LOGIN', 'users', ?, ?, ?, ?)");
 $newData = json_encode([
     'email' => $email,
     'name'  => $name,
-    'role'  => $role ?? 'user'
+    'role'  => $role ?? 'user',
+    'tz'    => $tz
 ]);
+$auditStmt = $conn->prepare("INSERT INTO audit_trail 
+    (user_id, action, table_name, record_id, new_data, ip_address, created_at) 
+    VALUES (?, 'LOGIN', 'users', ?, ?, ?, ?)");
 $auditStmt->bind_param("iisss", $userId, $userId, $newData, $ip, $now);
 $auditStmt->execute();
 $auditStmt->close();
 
 $conn->close();
 
-// STEP 7: Store session (with ID)
+// =====================
+// STEP 8: Store session & redirect
+// =====================
 $_SESSION['user'] = [
-    'id' => $userId,
+    'id'    => $userId,
     'email' => $email,
-    'name' => $name,
+    'name'  => $name,
     'picture' => $userInfo->picture,
-    'role' => $role ?? 'user' // If new user, default role
+    'role'  => $role ?? 'user',
+    'timezone' => $tz
 ];
 
-// STEP 8: Redirect based on role & environment
-// If admin
 if ($_SESSION['user']['role'] == 'admin') {
-    if ($isLocal) {
-        header('Location: http://localhost:3000/pages/dashboard.php');
-    } else {
-        header('Location: https://arcguide.bascpcc.com/pages/dashboard.php');
-    }
-    exit;
-}
-
-// Otherwise normal user
-if ($isLocal) {
-    header('Location: http://localhost:3000/index.php');
+    header('Location: ' . ($isLocal ? 'http://localhost:3000/pages/dashboard.php' : 'https://arcguide.bascpcc.com/pages/dashboard.php'));
 } else {
-    header('Location: https://arcguide.bascpcc.com/index.php');
+    header('Location: ' . ($isLocal ? 'http://localhost:3000/index.php' : 'https://arcguide.bascpcc.com/index.php'));
 }
 exit;
