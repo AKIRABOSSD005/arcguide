@@ -1,23 +1,21 @@
 <?php
 // ../functions/events_submit.php
-// Always start the session first
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 // Check if the user is logged in
 if (!isset($_SESSION['user'])) {
-    // User is not logged in; redirect to login page
     header("Location: ../pages/loginPage.php");
     exit();
 }
 
-include '../config/dbcon.php'; // adjust path as needed
+include '../config/dbcon.php'; 
 
 if (isset($_POST['submitEvent'])) {
     // Sanitize input
     $title = mysqli_real_escape_string($conn, trim($_POST['title']));
-    $start_date = mysqli_real_escape_string($conn, string: trim($_POST['start_date']));
+    $start_date = mysqli_real_escape_string($conn, trim($_POST['start_date']));
     $end_date = mysqli_real_escape_string($conn, trim($_POST['end_date']));
     $location = mysqli_real_escape_string($conn, trim($_POST['location']));
     $category_id = intval($_POST['category_id']);
@@ -35,13 +33,38 @@ if (isset($_POST['submitEvent'])) {
         }
     }
 
-    // Insert into database
+    // Insert into events
     $sql = "INSERT INTO events (title, description, start_date, end_date, location, image, category_id, is_approved, created_by, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 0, 1, NOW())";
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'admin', ?, NOW())"; 
     $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "ssssssi", $title, $description, $start_date, $end_date, $location, $image_path, $category_id);
+
+    $created_by = $_SESSION['user']['id']; // logged-in user ID
+    mysqli_stmt_bind_param($stmt, "ssssssii", $title, $description, $start_date, $end_date, $location, $image_path, $category_id, $created_by);
 
     if (mysqli_stmt_execute($stmt)) {
+        $eventId = mysqli_insert_id($conn);
+
+        // ✅ Insert into Audit Trail
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $now = date('Y-m-d H:i:s');
+        $userId = $_SESSION['user']['id'];
+        $newData = json_encode([
+            'title'       => $title,
+            'description' => $description,
+            'start_date'  => $start_date,
+            'end_date'    => $end_date,
+            'location'    => $location,
+            'category_id' => $category_id,
+            'image'       => $image_path
+        ]);
+
+        $auditSql = "INSERT INTO audit_trail (user_id, action, table_name, record_id, new_data, ip_address, created_at) 
+                     VALUES (?, 'INSERT', 'events', ?, ?, ?, ?)";
+        $auditStmt = $conn->prepare($auditSql);
+        $auditStmt->bind_param("iisss", $userId, $eventId, $newData, $ip, $now);
+        $auditStmt->execute();
+        $auditStmt->close();
+
         header("Location: ../pages/events.php?success=1");
         exit;
     } else {

@@ -84,6 +84,19 @@ if ($result->num_rows === 0) {
     $updateStmt->close();
 }
 
+// ✅ STEP 6.1: Insert into Audit Trail (LOGIN)
+$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+$auditStmt = $conn->prepare("INSERT INTO audit_trail (user_id, action, table_name, record_id, new_data, ip_address, created_at) 
+                             VALUES (?, 'LOGIN', 'users', ?, ?, ?, ?)");
+$newData = json_encode([
+    'email' => $email,
+    'name'  => $name,
+    'role'  => $role ?? 'user'
+]);
+$auditStmt->bind_param("iisss", $userId, $userId, $newData, $ip, $now);
+$auditStmt->execute();
+$auditStmt->close();
+
 $conn->close();
 
 // STEP 7: Store session (with ID)
