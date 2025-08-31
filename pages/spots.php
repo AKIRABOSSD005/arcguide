@@ -1,4 +1,5 @@
 <?php
+require '../config/nocache.php';
 require_once '../functions/spotsData.php';
 if (session_status() === PHP_SESSION_NONE) {
   session_start();

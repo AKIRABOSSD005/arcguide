@@ -1,4 +1,5 @@
 <?php
+require '../config/nocache.php';
 require_once(__DIR__ . '/../config/dbcon.php');
 
 // Get visitor details

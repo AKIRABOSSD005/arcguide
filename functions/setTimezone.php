@@ -1,5 +1,8 @@
 <?php
-session_start();
+require '../config/nocache.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 if (!empty($_POST['visitorTimezone'])) {
     $_SESSION['user_timezone'] = $_POST['visitorTimezone'];

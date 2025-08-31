@@ -1,4 +1,5 @@
 <?php
+require '../config/nocache.php';
 require_once '../vendor/autoload.php';
 
 $client = new Google_Client();

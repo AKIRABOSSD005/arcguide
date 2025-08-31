@@ -1,4 +1,5 @@
 <?php
+require '../config/nocache.php';    
 session_start();
 require '../config/dbcon.php';
 
