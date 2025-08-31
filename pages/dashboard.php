@@ -85,9 +85,10 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
                         <span class="fw-semibold mt-2">
                             <?php echo htmlspecialchars($_SESSION['user']['name'] ?? 'Guest'); ?>
                         </span>
-                        
+
                         <img src="<?= htmlspecialchars($_SESSION['user']['picture']) ?>" alt="Profile"
-                            class="rounded-circle" width="36" height="36" style="object-fit: cover;">
+                            class="rounded-circle" width="36" height="36" style="object-fit: cover; cursor:pointer;"
+                            data-bs-toggle="modal" data-bs-target="#logoutModal">
                     </div>
                 </div>
 
@@ -194,7 +195,7 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                        <a href="functions/logout.php" class="btn btn-danger">Yes, Logout</a>
+                        <a href="../functions/logout.php" class="btn btn-danger">Yes, Logout</a>
                     </div>
                 </div>
             </div>

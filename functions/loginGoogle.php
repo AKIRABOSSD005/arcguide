@@ -11,7 +11,7 @@ if (
     $_SERVER['SERVER_ADDR'] === '127.0.0.1' ||
     $_SERVER['SERVER_ADDR'] === '::1'
 ) {
-    $redirectUri = 'http://localhost/arcguide/functions/callback.php';
+    $redirectUri = 'http://localhost:3000/functions/callback.php';
 } else {
     $redirectUri = 'https://arcguide.bascpcc.com/functions/callback.php';
 }

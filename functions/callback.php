@@ -11,15 +11,17 @@ $client->setClientId('278002340718-260nltculojfelvkfb8na37fp6e86b6c.apps.googleu
 $client->setClientSecret('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');
 
 // Determine redirect URI
+$host = $_SERVER['HTTP_HOST']; // includes port if present
 if (
-    strpos($_SERVER['HTTP_HOST'], 'localhost') === 0 ||
-    strpos($_SERVER['SERVER_NAME'], 'localhost') === 0 ||
-    $_SERVER['SERVER_ADDR'] === '127.0.0.1' ||
-    $_SERVER['SERVER_ADDR'] === '::1'
+    strpos($host, 'localhost') === 0 ||
+    strpos($host, '127.0.0.1') === 0 ||
+    strpos($host, '[::1]') === 0
 ) {
-    $redirectUri = 'http://localhost/arcguide/functions/callback.php';
+    $redirectUri = 'http://localhost:3000/functions/callback.php';
+    $isLocal = true;
 } else {
     $redirectUri = 'https://arcguide.bascpcc.com/functions/callback.php';
+    $isLocal = false;
 }
 $client->setRedirectUri($redirectUri);
 
@@ -94,12 +96,10 @@ $_SESSION['user'] = [
 ];
 
 // STEP 8: Redirect based on role & environment
-$isLocal = in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1']);
-
 // If admin
 if ($_SESSION['user']['role'] == 'admin') {
     if ($isLocal) {
-        header('Location: http://localhost/arcguide/pages/dashboard.php');
+        header('Location: http://localhost:3000/pages/dashboard.php');
     } else {
         header('Location: https://arcguide.bascpcc.com/pages/dashboard.php');
     }
@@ -108,7 +108,7 @@ if ($_SESSION['user']['role'] == 'admin') {
 
 // Otherwise normal user
 if ($isLocal) {
-    header('Location: http://localhost/arcguide/index.php');
+    header('Location: http://localhost:3000/index.php');
 } else {
     header('Location: https://arcguide.bascpcc.com/index.php');
 }
