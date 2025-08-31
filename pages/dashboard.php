@@ -163,22 +163,92 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
                         <div class="card shadow-sm border-0 h-100">
                             <div class="card-body">
                                 <h6 class="card-title mb-2">Tourist Spots by Category</h6>
+                                <?php include '../functions/get_spots_data.php'; ?>
                                 <canvas id="spotsChart"></canvas>
+
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="row g-3 mb-4">
+                <div class="row g-3 my-4">
                     <div class="col-12">
                         <div class="card shadow-sm border-0">
                             <div class="card-body">
-                                <h6 class="card-title mb-2">Recent Activity</h6>
-                                <!-- Recent activity content here -->
+                                <h6 class="card-title mb-3">Recent Activity</h6>
+
+                                <!-- Sample Table -->
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">User</th>
+                                                <th scope="col">Action</th>
+                                                <th scope="col">Date</th>
+                                                <th scope="col">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>Earl</td>
+                                                <td>Logged In</td>
+                                                <td>2025-08-31 10:25 AM</td>
+                                                <td><span class="badge bg-success">Success</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>2</td>
+                                                <td>Anna</td>
+                                                <td>Viewed Dashboard</td>
+                                                <td>2025-08-30 3:40 PM</td>
+                                                <td><span class="badge bg-info">Info</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>3</td>
+                                                <td>Mark</td>
+                                                <td>Logged Out</td>
+                                                <td>2025-08-30 2:15 PM</td>
+                                                <td><span class="badge bg-secondary">Done</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>4</td>
+                                                <td>Mark</td>
+                                                <td>Logged Out</td>
+                                                <td>2025-08-30 2:15 PM</td>
+                                                <td><span class="badge bg-secondary">Done</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>5</td>
+                                                <td>Mark</td>
+                                                <td>Logged Out</td>
+                                                <td>2025-08-30 2:15 PM</td>
+                                                <td><span class="badge bg-secondary">Done</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>6</td>
+                                                <td>Mark</td>
+                                                <td>Logged Out</td>
+                                                <td>2025-08-30 2:15 PM</td>
+                                                <td><span class="badge bg-secondary">Done</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>7</td>
+                                                <td>Mark</td>
+                                                <td>Logged Out</td>
+                                                <td>2025-08-30 2:15 PM</td>
+                                                <td><span class="badge bg-secondary">Done</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- End Sample Table -->
+
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </main>
 
@@ -208,16 +278,13 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
             style="display:none;">
             &uarr;
         </button>
-
-
-
-
     </div>
 
 
+    <br><br>
 
     <footer class="footer mt-auto">
-        <div class="container text-center py-4">
+        <div class="container text-center py-2">
             <p class="mb-0" style="color: #123c63;">&copy; 2025 ArcGuide. All rights reserved.</p>
             <p class="mb-0" style="color: #123c63;">Made with ❤️ by EGDD</p>
         </div>
@@ -240,9 +307,9 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
 
     </script>
 
+    <!-- === Visitors per Year Chart === -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // === Visitors per Year Chart ===
             if (typeof visitorChartData !== "undefined") {
                 const ctx1 = document.getElementById("visitorsChart").getContext("2d");
                 new Chart(ctx1, {
@@ -276,32 +343,52 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
                             }
                         }
                     }
-
                 });
             }
+        });
+    </script>
 
-            // === Tourist Spots by Category ===
+    <!-- === Tourist Spots by Category === -->
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
             if (typeof spotsByCategory !== "undefined") {
                 const ctx2 = document.getElementById("spotsChart").getContext("2d");
                 new Chart(ctx2, {
-                    type: "doughnut",
+                    type: "bar",
                     data: {
                         labels: spotsByCategory.labels,
                         datasets: [{
+                            label: "Total Tourist Spots: " + spotsByCategory.total,
                             data: spotsByCategory.counts,
-                            backgroundColor: ["#114f89", "#46b07d", "#f5a623", "#e94e77"],
+                            backgroundColor: [
+                                "rgba(17, 79, 137, 0.8)",
+                                "rgba(23, 162, 184, 0.8)",
+                                "rgba(40, 167, 69, 0.8)",
+                                "rgba(255, 193, 7, 0.8)",
+                                "rgba(220, 53, 69, 0.8)"
+                            ],
+                            borderColor: "#fff",
+                            borderWidth: 2
                         }]
                     },
                     options: {
                         responsive: true,
                         plugins: {
-                            legend: { position: "bottom" }
+                            legend: {
+                                display: false // ✅ hides the legend (no button/color)
+                            }
                         }
                     }
                 });
             }
         });
+
     </script>
+
+
+
+
 
 
 
