@@ -21,6 +21,15 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
     <link rel="stylesheet" href="https://cdn.lineicons.com/4.0/lineicons.css">
 </head>
 <style>
+    .spot-icon {
+        color: #114f89;
+        transition: color 0.3s ease;
+    }
+
+    .spot-icon:hover {
+        color: #46b07d;
+    }
+
     .btn-custom {
         background-color: #114f89;
         border-color: #114f89;
@@ -95,7 +104,7 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
             <div class="container-fluid py-4">
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap mx-5 dashboard-header">
                     <h5 class="fw-semibold mb-0">
-                         Manage Tourists Spots <i class="bi bi-geo-alt-fill text-primary"></i>
+                        Manage Tourists Spots <i class="bi bi-image-alt spot-icon"></i>
                     </h5>
                     <div class="d-flex align-items-center gap-2">
                         <span class="fw-semibold mt-2">
