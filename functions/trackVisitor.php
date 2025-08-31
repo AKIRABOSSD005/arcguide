@@ -1,33 +1,33 @@
 <?php
 require_once(__DIR__ . '/../config/dbcon.php');
 
-
 // Get visitor details
 $ip = $_SERVER['REMOTE_ADDR'];
 $userAgent = $_SERVER['HTTP_USER_AGENT'];
-$today = date('Y-m-d');
 
-// Check if already logged today (to avoid duplicate multiple logs per refresh)
-$stmt = $conn->prepare("SELECT id FROM visitors WHERE ip_address = ? AND visit_date = ?");
-$stmt->bind_param("ss", $ip, $today);
+// Get visitor local time from POST, fallback to server time
+$visitorDateTime = $_POST['visitorDateTime'] ?? date('Y-m-d H:i:s');
+
+// Extract date for unique check
+$today = substr($visitorDateTime, 0, 10); // YYYY-MM-DD
+
+// Insert or update visitor (safe from duplicates)
+$stmt = $conn->prepare("
+    INSERT INTO visitors (ip_address, user_agent, visit_date, created_at)
+    VALUES (?, ?, ?, ?)
+    ON DUPLICATE KEY UPDATE user_agent = VALUES(user_agent), created_at = VALUES(created_at)
+");
+$stmt->bind_param("ssss", $ip, $userAgent, $today, $visitorDateTime);
 $stmt->execute();
-$stmt->store_result();
-
-if ($stmt->num_rows === 0) {
-    // Insert new record
-    $stmt = $conn->prepare("INSERT INTO visitors (ip_address, user_agent, visit_date) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $ip, $userAgent, $today);
-    $stmt->execute();
-}
-
 $stmt->close();
 
-
-$query = "SELECT YEAR(visit_date) AS year, COUNT(DISTINCT ip_address) AS total_visitors
-          FROM visitors
-          GROUP BY YEAR(visit_date)
-          ORDER BY year ASC";
-
+// Fetch yearly visitor totals
+$query = "
+    SELECT YEAR(visit_date) AS year, COUNT(DISTINCT ip_address) AS total_visitors
+    FROM visitors
+    GROUP BY YEAR(visit_date)
+    ORDER BY year ASC
+";
 $result = $conn->query($query);
 
 $years = [];
@@ -38,8 +38,7 @@ while ($row = $result->fetch_assoc()) {
     $totals[] = $row['total_visitors'];
 }
 
-
-// Encode for frontend
+// Pass data to frontend for chart
 $visitorData = [
     "years" => $years,
     "totals" => $totals

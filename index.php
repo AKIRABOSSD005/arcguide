@@ -204,35 +204,57 @@ require_once 'functions/trackVisitor.php';
 
 
     </div>
-        <!-- Toast Container -->
-        <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
-            <div id="guestToast" class="toast border-0 shadow-sm rounded-4 bg-white text-dark" role="alert"
-                aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
-                <div class="d-flex align-items-center p-3">
-                    <!-- Icon (Optional SVG for minimalism) -->
-                    <div class="me-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#114f89"
-                            class="bi bi-person-circle" viewBox="0 0 16 16">
-                            <path d="M11 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
-                            <path fill-rule="evenodd"
-                                d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 1 0 0 14A7 7 0 0 0 8 1z" />
-                        </svg>
-                    </div>
-                    <!-- Message -->
-                    <div class="toast-body fs-6 text-dark pe-2">
-                        You are browsing as a guest.
-                    </div>
-                    <!-- Close Button -->
-                    <button type="button" class="btn-close ms-auto me-1" data-bs-dismiss="toast"
-                        aria-label="Close"></button>
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+        <div id="guestToast" class="toast border-0 shadow-sm rounded-4 bg-white text-dark" role="alert"
+            aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+            <div class="d-flex align-items-center p-3">
+                <!-- Icon (Optional SVG for minimalism) -->
+                <div class="me-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#114f89"
+                        class="bi bi-person-circle" viewBox="0 0 16 16">
+                        <path d="M11 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                        <path fill-rule="evenodd"
+                            d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 1 0 0 14A7 7 0 0 0 8 1z" />
+                    </svg>
                 </div>
+                <!-- Message -->
+                <div class="toast-body fs-6 text-dark pe-2">
+                    You are browsing as a guest.
+                </div>
+                <!-- Close Button -->
+                <button type="button" class="btn-close ms-auto me-1" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
             </div>
         </div>
+    </div>
 
 
 
     <script src="assets/bootstrap-5.3.3-dist/js/bootstrap.bundle.js"></script>
     <script src="assets/js/script.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Get visitor's local datetime in format YYYY-MM-DD HH:MM:SS
+            const visitorTime = new Date();
+            const visitorDateTime = visitorTime.getFullYear() + '-' +
+                String(visitorTime.getMonth() + 1).padStart(2, '0') + '-' +
+                String(visitorTime.getDate()).padStart(2, '0') + ' ' +
+                String(visitorTime.getHours()).padStart(2, '0') + ':' +
+                String(visitorTime.getMinutes()).padStart(2, '0') + ':' +
+                String(visitorTime.getSeconds()).padStart(2, '0');
+
+            // Send to server via POST
+            fetch('functions/trackVisitor.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'visitorDateTime=' + encodeURIComponent(visitorDateTime)
+            })
+                .catch(err => console.error('Visitor tracking error:', err));
+        });
+    </script>
+
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const isGuest = <?= json_encode($isGuest) ?>;
