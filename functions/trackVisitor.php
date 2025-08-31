@@ -1,5 +1,6 @@
 <?php
-require_once 'config/dbcon.php';
+require_once(__DIR__ . '/../config/dbcon.php');
+
 
 // Get visitor details
 $ip = $_SERVER['REMOTE_ADDR'];
@@ -36,3 +37,12 @@ while ($row = $result->fetch_assoc()) {
     $years[] = $row['year'];
     $totals[] = $row['total_visitors'];
 }
+
+
+// Encode for frontend
+$visitorData = [
+    "years" => $years,
+    "totals" => $totals
+];
+
+echo "<script>var visitorChartData = " . json_encode($visitorData) . ";</script>";

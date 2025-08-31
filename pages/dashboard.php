@@ -153,7 +153,9 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
                         <div class="card shadow-sm border-0 h-100">
                             <div class="card-body">
                                 <h6 class="card-title mb-2">Visitors per Year</h6>
-                                <canvas id="visitorsChart"></canvas>
+                                <canvas id="visitorsChart">
+                                    <?php include '../functions/trackVisitor.php'; ?>
+                                </canvas>
                             </div>
                         </div>
                     </div>
@@ -237,6 +239,72 @@ $isGuest = !isset($_SESSION['user']) || empty($_SESSION['user']);
         });
 
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // === Visitors per Year Chart ===
+            if (typeof visitorChartData !== "undefined") {
+                const ctx1 = document.getElementById("visitorsChart").getContext("2d");
+                new Chart(ctx1, {
+                    type: "bar",
+                    data: {
+                        labels: visitorChartData.years,
+                        datasets: [{
+                            label: "Visitors",
+                            data: visitorChartData.totals,
+                            borderColor: "#114f89",
+                            backgroundColor: "rgba(17,79,137,0.2)",
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    callback: function (value) {
+                                        return Number.isInteger(value) ? value : null;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                });
+            }
+
+            // === Tourist Spots by Category ===
+            if (typeof spotsByCategory !== "undefined") {
+                const ctx2 = document.getElementById("spotsChart").getContext("2d");
+                new Chart(ctx2, {
+                    type: "doughnut",
+                    data: {
+                        labels: spotsByCategory.labels,
+                        datasets: [{
+                            data: spotsByCategory.counts,
+                            backgroundColor: ["#114f89", "#46b07d", "#f5a623", "#e94e77"],
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: "bottom" }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+
+
+
     </body>
 
 </html>
